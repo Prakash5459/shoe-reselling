@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment | SneakerVerse</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">SneakerVerse</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+    </nav>
+  </header>
+
+  <section class="featured">
+    <h2>Payment</h2>
+    <form class="payment-form" onsubmit="submitPayment(event)">
+      <input type="text" placeholder="Full Name" required />
+      <input type="text" placeholder="Shipping Address" required />
+      <input type="text" placeholder="Card Number" required />
+      <input type="month" required />
+      <input type="text" placeholder="CVV" required />
+      <input type="text" id="coupon" placeholder="Coupon Code (Optional)" />
+      <p>Discount: <span id="discount">$0</span></p>
+      <p>Grand Total: $<span id="grandTotal"></span></p>
+      <button type="submit">Pay Now</button>
+    </form>
+  </section>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function submitPayment(e) {
+      e.preventDefault();
+      const coupon = document.getElementById("coupon").value;
+      let total = cart.reduce((sum, item) => sum + item.price, 0);
+      let discount = 0;
+
+      if (coupon === "SAVE10") discount = total * 0.1;
+
+      const grandTotal = total - discount;
+      document.getElementById("discount").textContent = "$" + discount.toFixed(2);
+      document.getElementById("grandTotal").textContent = grandTotal.toFixed(2);
+
+      setTimeout(() => {
+        alert("Payment successful! Order confirmed.");
+        localStorage.removeItem("cart");
+        window.location.href = "index.html";
+      }, 1000);
+    }
+
+    window.onload = function () {
+      let total = cart.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById("grandTotal").textContent = total.toFixed(2);
+    };
+  </script>
+</body>
+</html>

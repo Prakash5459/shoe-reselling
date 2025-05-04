@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nike Shoes | SneakerVerse</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">SneakerVerse</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart 🛒<span id="cart-count">0</span></a>
+    </nav>
+  </header>
+
+  <section class="featured">
+    <h2>👟 Nike Collection</h2>
+    <select onchange="sortNike(this.value)">
+      <option value="">Sort By</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+    <div class="product-grid" id="brand-products"></div>
+  </section>
+
+  <script>
+    const nikeProducts = [
+      { name: "Nike Air Max 90", price: 150, img: "nike1.jpg" },
+      { name: "Nike Air Force 1", price: 120, img: "nike2.jpg" },
+      { name: "Nike Dunk Low", price: 135, img: "nike3.jpg" },
+      { name: "Nike Air Jordan 1", price: 180, img: "nike4.jpg" },
+      { name: "Nike React Infinity", price: 145, img: "nike5.jpg" },
+      { name: "Nike Blazer Mid '77", price: 110, img: "nike6.jpg" }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function updateCartCount() {
+      const count = document.getElementById("cart-count");
+      if (count) count.textContent = cart.length;
+    }
+
+    function renderNike(products) {
+      const container = document.getElementById("brand-products");
+      container.innerHTML = products.map((p, i) => `
+        <div class="product-card">
+          <img src="${p.img}" alt="${p.name}" style="width:100%; height:180px; object-fit:cover" />
+          <h3>${p.name}</h3>
+          <p>$${p.price}</p>
+          <label>Size:</label>
+          <select id="size-${i}">
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+          <button onclick="addToCart(${i})">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(index) {
+      const size = document.getElementById(`size-${index}`).value;
+      const product = { ...nikeProducts[index], size };
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+      alert(`${product.name} (Size ${size}) added to cart!`);
+    }
+
+    function sortNike(type) {
+      let sorted = [...nikeProducts];
+      if (type === "low") sorted.sort((a, b) => a.price - b.price);
+      else if (type === "high") sorted.sort((a, b) => b.price - a.price);
+      renderNike(sorted);
+    }
+
+    window.onload = () => {
+      renderNike(nikeProducts);
+      updateCartCount();
+    };
+  </script>
+</body>
+</html>

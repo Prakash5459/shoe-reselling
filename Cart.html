@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cart | SneakerVerse</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">SneakerVerse</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart 🛒</a>
+    </nav>
+  </header>
+
+  <section class="featured">
+    <h2>Your Cart</h2>
+    <div id="cart-items" class="product-grid"></div>
+    <h3>Total: $<span id="total"></span></h3>
+    <a href="payment.html" class="checkout-btn">Proceed to Payment</a>
+  </section>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function showCartItems() {
+      const container = document.getElementById("cart-items");
+      const totalElem = document.getElementById("total");
+      container.innerHTML = cart.map((item, index) => `
+        <div class="product-card">
+          <h4>${item.name}</h4>
+          <p>Size: ${item.size || "N/A"}</p>
+          <p>$${item.price}</p>
+          <button onclick="removeItem(${index})">Remove</button>
+        </div>
+      `).join('');
+      totalElem.textContent = cart.reduce((sum, item) => sum + item.price, 0);
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      showCartItems();
+    }
+
+    window.onload = showCartItems;
+  </script>
+</body>
+</html>
