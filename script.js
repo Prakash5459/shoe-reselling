@@ -14,8 +14,8 @@ let featuredProducts = [
   {
     name: "Puma RS-X",
     price: 130,
-    img: "puma1.jpg",
-    images: ["puma1.jpg", "puma1-top.jpg"]
+    img: "puma1.png",
+    images: ["puma1-side.png", "puma1-top.png"]
   }
 ];
 
