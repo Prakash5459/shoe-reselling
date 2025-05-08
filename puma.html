@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puma Shoes | SneakerVerse</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f7f7;
+      color: #111;
+      line-height: 1.6;
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #111;
+      color: white;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .navbar a {
+      margin-left: 15px;
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .featured {
+      padding: 2rem;
+    }
+
+    .featured h2 {
+      margin-bottom: 1rem;
+      color: #222;
+    }
+
+    select {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: scale(1.02);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .product-card h3 {
+      margin: 0.5rem 0;
+    }
+
+    .product-card select {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      padding: 0.4rem;
+      width: 100%;
+      border-radius: 5px;
+    }
+
+    .product-card button {
+      background-color: #111;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .product-card button:hover {
+      background-color: #333;
+    }
+
+    @media (max-width: 768px) {
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .navbar {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .navbar a {
+        margin: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">SneakerVerse</div>
+    <nav class="navbar">
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart 🛒<span id="cart-count">0</span></a>
+    </nav>
+  </header>
+
+  <section class="featured">
+    <h2>👟 Puma Collection</h2>
+    <select onchange="sortPuma(this.value)">
+      <option value="">Sort By</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+    <div class="product-grid" id="brand-products"></div>
+  </section>
+
+  <script>
+    const pumaProducts = [
+      { name: "Puma RS-X", price: 130, img: "images/puma1.jpg" },
+      { name: "Puma Suede Classic", price: 80, img: "images/puma2.jpg" },
+      { name: "Puma Cali Star", price: 90, img: "images/puma3.jpg" },
+      { name: "Puma Slipstream", price: 120, img: "images/puma4.jpg" },
+      { name: "Puma Future Rider", price: 100, img: "images/puma5.jpg" },
+      { name: "Puma Wild Rider", price: 110, img: "images/puma6.jpg" }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function updateCartCount() {
+      const count = document.getElementById("cart-count");
+      if (count) count.textContent = cart.length;
+    }
+
+    function renderPuma(products) {
+      const container = document.getElementById("brand-products");
+      container.innerHTML = products.map((p, i) => `
+        <div class="product-card">
+          <img src="${p.img}" alt="${p.name}" />
+          <h3>${p.name}</h3>
+          <p>$${p.price}</p>
+          <label>Size:</label>
+          <select id="size-${i}">
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+          <button onclick="addToCart(${i})">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+
+    function addToCart(index) {
+      const size = document.getElementById(`size-${index}`).value;
+      const product = { ...pumaProducts[index], size };
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+      alert(`${product.name} (Size ${size}) added to cart!`);
+    }
+
+    function sortPuma(type) {
+      let sorted = [...pumaProducts];
+      if (type === "low") sorted.sort((a, b) => a.price - b.price);
+      else if (type === "high") sorted.sort((a, b) => b.price - a.price);
+      renderPuma(sorted);
+    }
+
+    window.onload = () => {
+      renderPuma(pumaProducts);
+      updateCartCount();
+    };
+  </script>
+</body>
+</html>
