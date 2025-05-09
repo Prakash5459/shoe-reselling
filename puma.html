@@ -4,124 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Puma Shoes | SneakerVerse</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f7f7;
-      color: #111;
-      line-height: 1.6;
-    }
-
-    .main-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #111;
-      color: white;
-      padding: 1rem 2rem;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    .navbar a {
-      margin-left: 15px;
-      color: white;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-
-    .featured {
-      padding: 2rem;
-    }
-
-    .featured h2 {
-      margin-bottom: 1rem;
-      color: #222;
-    }
-
-    select {
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 6px;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .product-card {
-      background-color: white;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      text-align: center;
-      transition: transform 0.2s ease;
-    }
-
-    .product-card:hover {
-      transform: scale(1.02);
-    }
-
-    .product-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-    .product-card h3 {
-      margin: 0.5rem 0;
-    }
-
-    .product-card select {
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
-      padding: 0.4rem;
-      width: 100%;
-      border-radius: 5px;
-    }
-
-    .product-card button {
-      background-color: #111;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .product-card button:hover {
-      background-color: #333;
-    }
-
-    @media (max-width: 768px) {
-      .main-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .navbar {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 0.5rem;
-      }
-      .navbar a {
-        margin: 5px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="main-header">
@@ -155,15 +38,14 @@
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     function updateCartCount() {
-      const count = document.getElementById("cart-count");
-      if (count) count.textContent = cart.length;
+      document.getElementById("cart-count").textContent = cart.length;
     }
 
     function renderPuma(products) {
       const container = document.getElementById("brand-products");
       container.innerHTML = products.map((p, i) => `
         <div class="product-card">
-          <img src="${p.img}" alt="${p.name}" />
+          <img src="${p.img}" alt="${p.name}" style="width:100%; height:180px; object-fit:cover;" />
           <h3>${p.name}</h3>
           <p>$${p.price}</p>
           <label>Size:</label>
@@ -181,7 +63,12 @@
 
     function addToCart(index) {
       const size = document.getElementById(`size-${index}`).value;
-      const product = { ...pumaProducts[index], size };
+      const product = {
+        name: pumaProducts[index].name,
+        price: pumaProducts[index].price,
+        size: size,
+        image: pumaProducts[index].img
+      };
       cart.push(product);
       localStorage.setItem("cart", JSON.stringify(cart));
       updateCartCount();
