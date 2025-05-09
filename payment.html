@@ -18,12 +18,26 @@
     <form class="payment-form" onsubmit="submitPayment(event)">
       <input type="text" placeholder="Full Name" required />
       <input type="text" placeholder="Shipping Address" required />
-      <input type="text" placeholder="Card Number" required />
+      <input
+        type="text"
+        placeholder="Card Number"
+        required
+        maxlength="12"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,12);"
+      />
       <input type="month" required />
-      <input type="text" placeholder="CVV" required />
-      <input type="text" id="coupon" placeholder="Coupon Code (Optional)" />
-      <p>Discount: <span id="discount">$0</span></p>
-      <p>Grand Total: $<span id="grandTotal"></span></p>
+      <input
+        type="text"
+        placeholder="CVV"
+        required
+        maxlength="3"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,3);"
+      />
+      <input type="text" id="coupon" placeholder="Coupon Code (Optional)" oninput="updateTotal()" />
+      <p>Subtotal: $<span id="subtotal">0.00</span></p>
+      <p>Tax (13%): $<span id="tax">0.00</span></p>
+      <p>Discount: <span id="discount">$0.00</span></p>
+      <p><strong>Grand Total: $<span id="grandTotal">0.00</span></strong></p>
       <button type="submit">Pay Now</button>
     </form>
   </section>
@@ -31,29 +45,34 @@
   <script>
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    function submitPayment(e) {
-      e.preventDefault();
-      const coupon = document.getElementById("coupon").value;
-      let total = cart.reduce((sum, item) => sum + item.price, 0);
+    function calculateTotals() {
+      const coupon = document.getElementById("coupon").value.trim().toUpperCase();
+      const subtotal = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+      const tax = +(subtotal * 0.13).toFixed(2);
       let discount = 0;
 
-      if (coupon === "SAVE10") discount = total * 0.1;
+      if (coupon === "SAVE10") discount = +(subtotal * 0.1).toFixed(2);
 
-      const grandTotal = total - discount;
+      const grandTotal = +(subtotal + tax - discount).toFixed(2);
+
+      document.getElementById("subtotal").textContent = subtotal.toFixed(2);
+      document.getElementById("tax").textContent = tax.toFixed(2);
       document.getElementById("discount").textContent = "$" + discount.toFixed(2);
       document.getElementById("grandTotal").textContent = grandTotal.toFixed(2);
-
-      setTimeout(() => {
-        alert("Payment successful! Order confirmed.");
-        localStorage.removeItem("cart");
-        window.location.href = "index.html";
-      }, 1000);
     }
 
-    window.onload = function () {
-      let total = cart.reduce((sum, item) => sum + item.price, 0);
-      document.getElementById("grandTotal").textContent = total.toFixed(2);
-    };
+    function submitPayment(e) {
+      e.preventDefault();
+      alert("Payment successful! Order confirmed.");
+      localStorage.removeItem("cart");
+      window.location.href = "index.html";
+    }
+
+    function updateTotal() {
+      calculateTotals();
+    }
+
+    window.onload = calculateTotals;
   </script>
 </body>
 </html>
