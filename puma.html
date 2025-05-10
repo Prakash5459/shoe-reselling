@@ -2,63 +2,252 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Puma Shoes | SneakerVerse</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+      color: #111;
+    }
+    header {
+      background: rgba(17, 17, 17, 0.85);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .featured {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .featured h2 {
+      margin-bottom: 1rem;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .product-card {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      padding: 1rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .product-card:hover { transform: scale(1.02); }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .preview-images {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .preview-images img {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+    .preview-images img:hover {
+      border-color: #111;
+    }
+    select, button {
+      margin-top: 10px;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #111;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #333; }
+    .sort-select {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .cart-link { font-weight: bold; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    .modal img {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 12px;
+    }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      font-size: 2rem;
+      color: white;
+      background: rgba(0,0,0,0.4);
+      padding: 0.5rem 1rem;
+      border: none;
+      cursor: pointer;
+      transform: translateY(-50%);
+    }
+    .arrow-left { left: 20px; }
+    .arrow-right { right: 20px; }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <header class="main-header">
+
+  <header>
     <div class="logo">SneakerVerse</div>
-    <nav class="navbar">
+    <nav>
       <a href="index.html">Home</a>
-      <a href="cart.html">Cart 🛒<span id="cart-count">0</span></a>
+      <a href="cart.html" class="cart-link">Cart 🛒<span id="cart-count">0</span></a>
     </nav>
   </header>
 
   <section class="featured">
     <h2>👟 Puma Collection</h2>
-    <select onchange="sortPuma(this.value)">
+    <select class="sort-select" onchange="sortPuma(this.value)">
       <option value="">Sort By</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
     </select>
-    <div class="product-grid" id="brand-products"></div>
+    <div class="product-grid" id="product-list"></div>
   </section>
+
+  <!-- Modal -->
+  <div id="imageModal" class="modal">
+    <button class="close-btn" onclick="closeModal()">✖</button>
+    <button class="arrow arrow-left" onclick="prevImage()">‹</button>
+    <img id="modalImage" src="" alt="Preview" />
+    <button class="arrow arrow-right" onclick="nextImage()">›</button>
+  </div>
 
   <script>
     const pumaProducts = [
-      { name: "Puma RS-X", price: 130, img: "puma1.png" },
-      { name: "Puma Suede Classic", price: 80, img: "puma2.png" },
-      { name: "Puma Cali Star", price: 90, img: "puma3.png" },
-      { name: "Puma Slipstream", price: 120, img: "puma4.png" },
-      { name: "Puma Future Rider", price: 100, img: "puma5.png" },
-      { name: "Puma Wild Rider", price: 110, img: "puma6.png" }
+      {
+        name: "Puma RS-X", price: 130,
+        images: ["puma1.png", "puma1-side.png", "puma1-back.png", "puma1-top.png", "puma1-heel.png", "puma1-zoom.png"]
+      },
+      {
+        name: "Puma Suede Classic", price: 80,
+        images: ["puma2.png", "puma2-side.png", "puma2-back.png", "puma2-top.png", "puma2-heel.png", "puma2-zoom.png"]
+      },
+      {
+        name: "Puma Cali Star", price: 90,
+        images: ["puma3.png", "puma3-side.png", "puma3-back.png", "puma3-top.png", "puma3-heel.png", "puma3-zoom.png"]
+      },
+      {
+        name: "Puma Slipstream", price: 120,
+        images: ["puma4.png", "puma4-side.png", "puma4-back.png", "puma4-top.png", "puma4-heel.png", "puma4-zoom.png"]
+      },
+      {
+        name: "Puma Future Rider", price: 100,
+        images: ["puma5.png", "puma5-side.png", "puma5-back.png", "puma5-top.png", "puma5-heel.png", "puma5-zoom.png"]
+      },
+      {
+        name: "Puma Wild Rider", price: 110,
+        images: ["puma6.png", "puma6-side.png", "puma6-back.png", "puma6-top.png", "puma6-heel.png", "puma6-zoom.png"]
+      }
     ];
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let currentImages = [];
+    let currentIndex = 0;
 
     function updateCartCount() {
       document.getElementById("cart-count").textContent = cart.length;
     }
 
-    function renderPuma(products) {
-      const container = document.getElementById("brand-products");
-      container.innerHTML = products.map((p, i) => `
+    function renderProducts(products) {
+      const container = document.getElementById("product-list");
+      container.innerHTML = products.map((p, index) => `
         <div class="product-card">
-          <img src="${p.img}" alt="${p.name}" style="width:100%; height:180px; object-fit:cover;" />
+          <img src="${p.images[0]}" onclick="openModal(${index}, 0)" />
+          <div class="preview-images">
+            ${p.images.map((img, i) =>
+              `<img src="${img}" onclick="openModal(${index}, ${i})" />`
+            ).join('')}
+          </div>
           <h3>${p.name}</h3>
           <p>$${p.price}</p>
-          <label>Size:</label>
-          <select id="size-${i}">
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
+          <label for="size-${index}">Size:</label>
+          <select id="size-${index}">
+            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
           </select>
-          <button onclick="addToCart(${i})">Add to Cart</button>
+          <button onclick="addToCart(${index})">Add to Cart</button>
         </div>
       `).join('');
+    }
+
+    function openModal(productIndex, imageIndex = 0) {
+      currentImages = pumaProducts[productIndex].images;
+      currentIndex = imageIndex;
+      updateModalImage();
+      document.getElementById("imageModal").style.display = "flex";
+    }
+
+    function updateModalImage() {
+      document.getElementById("modalImage").src = currentImages[currentIndex];
+    }
+
+    function closeModal() {
+      document.getElementById("imageModal").style.display = "none";
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % currentImages.length;
+      updateModalImage();
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+      updateModalImage();
     }
 
     function addToCart(index) {
@@ -67,7 +256,7 @@
         name: pumaProducts[index].name,
         price: pumaProducts[index].price,
         size: size,
-        image: pumaProducts[index].img
+        image: pumaProducts[index].images[0]
       };
       cart.push(product);
       localStorage.setItem("cart", JSON.stringify(cart));
@@ -79,11 +268,11 @@
       let sorted = [...pumaProducts];
       if (type === "low") sorted.sort((a, b) => a.price - b.price);
       else if (type === "high") sorted.sort((a, b) => b.price - a.price);
-      renderPuma(sorted);
+      renderProducts(sorted);
     }
 
     window.onload = () => {
-      renderPuma(pumaProducts);
+      renderProducts(pumaProducts);
       updateCartCount();
     };
   </script>
