@@ -2,14 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Adidas Shoes | SneakerVerse</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+      color: #111;
+    }
+    header {
+      background: rgba(17, 17, 17, 0.85);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .featured {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .featured h2 {
+      margin-bottom: 1rem;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .product-card {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      padding: 1rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .product-card:hover { transform: scale(1.02); }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .preview-images {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .preview-images img {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .preview-images img:hover { border-color: #111; }
+    select, button {
+      margin-top: 10px;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #111;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #333; }
+    .sort-select {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    /* Zoom Modal Styles */
+    #zoomModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #zoomImage {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 12px;
+    }
+    .arrow {
+      position: absolute;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0.5rem 1rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 50%;
+    }
+    .arrow.left { left: 2rem; }
+    .arrow.right { right: 2rem; }
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-  <header class="main-header">
+
+  <header>
     <div class="logo">SneakerVerse</div>
-    <nav class="navbar">
+    <nav>
       <a href="index.html">Home</a>
       <a href="cart.html">Cart 🛒<span id="cart-count">0</span></a>
     </nav>
@@ -17,48 +150,95 @@
 
   <section class="featured">
     <h2>👟 Adidas Collection</h2>
-    <select onchange="sortAdidas(this.value)">
+    <select class="sort-select" onchange="sortAdidas(this.value)">
       <option value="">Sort By</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
     </select>
-    <div class="product-grid" id="brand-products"></div>
+    <div class="product-grid" id="product-list"></div>
   </section>
+
+  <!-- Zoom Modal -->
+  <div id="zoomModal" onclick="closeZoom()">
+    <button class="close-btn" onclick="closeZoom(event)">×</button>
+    <img id="zoomImage" src="" alt="Zoom View" />
+    <span class="arrow left" onclick="slideZoom(-1, event)">←</span>
+    <span class="arrow right" onclick="slideZoom(1, event)">→</span>
+  </div>
 
   <script>
     const adidasProducts = [
-      { name: "Ultraboost 22", price: 180, img: "adidas2.png" },
-      { name: "NMD R1", price: 140, img: "adidas3.png" },
-      { name: "Adizero SL", price: 130, img: "adidas4.png" },
-      { name: "Superstar", price: 95, img: "adidas5.png" },
-      { name: "Forum Low", price: 110, img: "adidas6.png" },
-      { name: "Gazelle", price: 100, img: "adidas7.png" }
+      {
+        name: "Ultraboost 22", price: 180,
+        images: ["adidas2.png", "adidas2-side.png", "adidas2-back.png", "adidas2-top.png", "adidas2-heel.png", "adidas2-zoom.png"]
+      },
+      {
+        name: "NMD R1", price: 140,
+        images: ["adidas3.png", "adidas3-side.png", "adidas3-back.png", "adidas3-top.png", "adidas3-heel.png", "adidas3-zoom.png"]
+      },
+      {
+        name: "Adizero SL", price: 130,
+        images: ["adidas4.png", "adidas4-side.png", "adidas4-back.png", "adidas4-top.png", "adidas4-heel.png", "adidas4-zoom.png"]
+      },
+      {
+        name: "Superstar", price: 95,
+        images: ["adidas5.png", "adidas5-side.png", "adidas5-back.png", "adidas5-top.png", "adidas5-heel.png", "adidas5-zoom.png"]
+      },
+      {
+        name: "Forum Low", price: 110,
+        images: ["adidas6.png", "adidas6-side.png", "adidas6-back.png", "adidas6-top.png", "adidas6-heel.png", "adidas6-zoom.png"]
+      },
+      {
+        name: "Gazelle", price: 100,
+        images: ["adidas7.png", "adidas7-side.png", "adidas7-back.png", "adidas7-top.png", "adidas7-heel.png", "adidas7-zoom.png"]
+      }
     ];
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let zoomIndex = 0;
+    let zoomImages = [];
 
     function updateCartCount() {
       document.getElementById("cart-count").textContent = cart.length;
     }
 
-    function renderAdidas(products) {
-      const container = document.getElementById("brand-products");
-      container.innerHTML = products.map((p, i) => `
+    function renderProducts(products) {
+      const container = document.getElementById("product-list");
+      container.innerHTML = products.map((p, index) => `
         <div class="product-card">
-          <img src="${p.img}" alt="${p.name}" />
+          <img src="${p.images[0]}" onclick="openZoom(${index}, 0)" />
+          <div class="preview-images">
+            ${p.images.map((img, i) =>
+              `<img src="${img}" onclick="openZoom(${index}, ${i})" />`
+            ).join('')}
+          </div>
           <h3>${p.name}</h3>
           <p>$${p.price}</p>
-          <label>Size:</label>
-          <select id="size-${i}">
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
+          <label for="size-${index}">Size:</label>
+          <select id="size-${index}">
+            <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
           </select>
-          <button onclick="addToCart(${i})">Add to Cart</button>
+          <button onclick="addToCart(${index})">Add to Cart</button>
         </div>
       `).join('');
+    }
+
+    function openZoom(productIndex, imageIndex) {
+      zoomImages = adidasProducts[productIndex].images;
+      zoomIndex = imageIndex;
+      document.getElementById("zoomImage").src = zoomImages[zoomIndex];
+      document.getElementById("zoomModal").style.display = "flex";
+    }
+
+    function closeZoom(e) {
+      if (e) e.stopPropagation();
+      document.getElementById("zoomModal").style.display = "none";
+    }
+
+    function slideZoom(direction, e) {
+      if (e) e.stopPropagation();
+      zoomIndex = (zoomIndex + direction + zoomImages.length) % zoomImages.length;
+      document.getElementById("zoomImage").src = zoomImages[zoomIndex];
     }
 
     function addToCart(index) {
@@ -67,7 +247,7 @@
         name: adidasProducts[index].name,
         price: adidasProducts[index].price,
         size: size,
-        image: adidasProducts[index].img
+        image: adidasProducts[index].images[0]
       };
       cart.push(product);
       localStorage.setItem("cart", JSON.stringify(cart));
@@ -79,11 +259,11 @@
       let sorted = [...adidasProducts];
       if (type === "low") sorted.sort((a, b) => a.price - b.price);
       else if (type === "high") sorted.sort((a, b) => b.price - a.price);
-      renderAdidas(sorted);
+      renderProducts(sorted);
     }
 
     window.onload = () => {
-      renderAdidas(adidasProducts);
+      renderProducts(adidasProducts);
       updateCartCount();
     };
   </script>
