@@ -23,6 +23,8 @@
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
+      text-decoration: none;
+      color: white;
     }
     nav a {
       color: white;
@@ -95,7 +97,6 @@
       border: 1px solid #ccc;
     }
 
-    /* Zoom Modal Styles */
     #zoomModal {
       display: none;
       position: fixed;
@@ -141,7 +142,7 @@
 <body>
 
   <header>
-    <div class="logo">SneakerVerse</div>
+    <a href="index.html" class="logo">SneakerVerse</a>
     <nav>
       <a href="index.html">Home</a>
       <a href="cart.html">Cart 🛒<span id="cart-count">0</span></a>
@@ -150,15 +151,17 @@
 
   <section class="featured">
     <h2>👟 Adidas Collection</h2>
-    <select class="sort-select" onchange="sortAdidas(this.value)">
-      <option value="">Sort By</option>
+    <select class="sort-select" onchange="handleFilterSort(this.value)">
+      <option value="">Sort & Filter</option>
+      <option value="all">All Shoes</option>
+      <option value="male">Men's Shoes</option>
+      <option value="female">Women's Shoes</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
     </select>
     <div class="product-grid" id="product-list"></div>
   </section>
 
-  <!-- Zoom Modal -->
   <div id="zoomModal" onclick="closeZoom()">
     <button class="close-btn" onclick="closeZoom(event)">×</button>
     <img id="zoomImage" src="" alt="Zoom View" />
@@ -168,30 +171,12 @@
 
   <script>
     const adidasProducts = [
-      {
-        name: "Ultraboost 22", price: 180,
-        images: ["adidas2.png", "adidas2-side.png", "adidas2-back.png", "adidas2-top.png", "adidas2-heel.png", "adidas2-zoom.png"]
-      },
-      {
-        name: "NMD R1", price: 140,
-        images: ["adidas3.png", "adidas3-side.png", "adidas3-back.png", "adidas3-top.png", "adidas3-heel.png", "adidas3-zoom.png"]
-      },
-      {
-        name: "Adizero SL", price: 130,
-        images: ["adidas4.png", "adidas4-side.png", "adidas4-back.png", "adidas4-top.png", "adidas4-heel.png", "adidas4-zoom.png"]
-      },
-      {
-        name: "Superstar", price: 95,
-        images: ["adidas5.png", "adidas5-side.png", "adidas5-back.png", "adidas5-top.png", "adidas5-heel.png", "adidas5-zoom.png"]
-      },
-      {
-        name: "Forum Low", price: 110,
-        images: ["adidas6.png", "adidas6-side.png", "adidas6-back.png", "adidas6-top.png", "adidas6-heel.png", "adidas6-zoom.png"]
-      },
-      {
-        name: "Gazelle", price: 100,
-        images: ["adidas7.png", "adidas7-side.png", "adidas7-back.png", "adidas7-top.png", "adidas7-heel.png", "adidas7-zoom.png"]
-      }
+      { name: "Ultraboost 22", price: 180, gender: "male", images: ["adidas2.png", "adidas2-side.png"] },
+      { name: "NMD R1", price: 140, gender: "female", images: ["adidas3.png", "adidas3-side.png"] },
+      { name: "Adizero SL", price: 130, gender: "male", images: ["adidas4.png", "adidas4-side.png"] },
+      { name: "Superstar", price: 95, gender: "female", images: ["adidas5.png", "adidas5-side.png"] },
+      { name: "Forum Low", price: 110, gender: "male", images: ["adidas6.png", "adidas6-side.png"] },
+      { name: "Gazelle", price: 100, gender: "female", images: ["adidas7.png", "adidas7-side.png"] }
     ];
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -255,11 +240,17 @@
       alert(`${product.name} (Size ${size}) added to cart!`);
     }
 
-    function sortAdidas(type) {
-      let sorted = [...adidasProducts];
-      if (type === "low") sorted.sort((a, b) => a.price - b.price);
-      else if (type === "high") sorted.sort((a, b) => b.price - a.price);
-      renderProducts(sorted);
+    function handleFilterSort(value) {
+      let filtered = [...adidasProducts];
+      if (value === "male" || value === "female") {
+        filtered = filtered.filter(p => p.gender === value);
+      }
+      if (value === "low") {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (value === "high") {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+      renderProducts(filtered);
     }
 
     window.onload = () => {

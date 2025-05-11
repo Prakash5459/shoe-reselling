@@ -23,6 +23,8 @@
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
+      color: white;
+      text-decoration: none;
     }
     nav a {
       color: white;
@@ -75,9 +77,7 @@
       border: 2px solid transparent;
       transition: border-color 0.2s ease;
     }
-    .preview-images img:hover {
-      border-color: #111;
-    }
+    .preview-images img:hover { border-color: #111; }
     select, button {
       margin-top: 10px;
       padding: 0.5rem;
@@ -98,7 +98,6 @@
       border: 1px solid #ccc;
     }
     .cart-link { font-weight: bold; }
-
     .modal {
       display: none;
       position: fixed;
@@ -143,7 +142,7 @@
 <body>
 
   <header>
-    <div class="logo">SneakerVerse</div>
+    <a href="index.html" class="logo">SneakerVerse</a>
     <nav>
       <a href="index.html">Home</a>
       <a href="cart.html" class="cart-link">Cart 🛒<span id="cart-count">0</span></a>
@@ -152,8 +151,10 @@
 
   <section class="featured">
     <h2>👟 Puma Collection</h2>
-    <select class="sort-select" onchange="sortPuma(this.value)">
-      <option value="">Sort By</option>
+    <select class="sort-select" onchange="filterAndSort(this.value)">
+      <option value="all">All Shoes</option>
+      <option value="men">Men's Shoes</option>
+      <option value="women">Women's Shoes</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
     </select>
@@ -171,34 +172,33 @@
   <script>
     const pumaProducts = [
       {
-        name: "Puma RS-X", price: 130,
+        name: "Puma RS-X", price: 130, gender: "men",
         images: ["puma1.png", "puma1-side.png", "puma1-back.png", "puma1-top.png", "puma1-heel.png", "puma1-zoom.png"]
       },
       {
-        name: "Puma Suede Classic", price: 80,
+        name: "Puma Suede Classic", price: 80, gender: "women",
         images: ["puma2.png", "puma2-side.png", "puma2-back.png", "puma2-top.png", "puma2-heel.png", "puma2-zoom.png"]
       },
       {
-        name: "Puma Cali Star", price: 90,
+        name: "Puma Cali Star", price: 90, gender: "women",
         images: ["puma3.png", "puma3-side.png", "puma3-back.png", "puma3-top.png", "puma3-heel.png", "puma3-zoom.png"]
       },
       {
-        name: "Puma Slipstream", price: 120,
+        name: "Puma Slipstream", price: 120, gender: "men",
         images: ["puma4.png", "puma4-side.png", "puma4-back.png", "puma4-top.png", "puma4-heel.png", "puma4-zoom.png"]
       },
       {
-        name: "Puma Future Rider", price: 100,
+        name: "Puma Future Rider", price: 100, gender: "women",
         images: ["puma5.png", "puma5-side.png", "puma5-back.png", "puma5-top.png", "puma5-heel.png", "puma5-zoom.png"]
       },
       {
-        name: "Puma Wild Rider", price: 110,
+        name: "Puma Wild Rider", price: 110, gender: "men",
         images: ["puma6.png", "puma6-side.png", "puma6-back.png", "puma6-top.png", "puma6-heel.png", "puma6-zoom.png"]
       }
     ];
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    let currentImages = [];
-    let currentIndex = 0;
+    let currentImages = [], currentIndex = 0;
 
     function updateCartCount() {
       document.getElementById("cart-count").textContent = cart.length;
@@ -264,11 +264,15 @@
       alert(`${product.name} (Size ${size}) added to cart!`);
     }
 
-    function sortPuma(type) {
-      let sorted = [...pumaProducts];
-      if (type === "low") sorted.sort((a, b) => a.price - b.price);
-      else if (type === "high") sorted.sort((a, b) => b.price - a.price);
-      renderProducts(sorted);
+    function filterAndSort(value) {
+      let filtered = [...pumaProducts];
+      if (value === "men") filtered = filtered.filter(p => p.gender === "men");
+      else if (value === "women") filtered = filtered.filter(p => p.gender === "women");
+
+      if (value === "low") filtered.sort((a, b) => a.price - b.price);
+      else if (value === "high") filtered.sort((a, b) => b.price - a.price);
+
+      renderProducts(filtered);
     }
 
     window.onload = () => {

@@ -23,12 +23,16 @@
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
+      color: white;
+      text-decoration: none;
     }
+    .logo:hover { text-decoration: underline; }
     nav a {
       color: white;
       text-decoration: none;
       margin-left: 20px;
     }
+    nav a:hover { text-decoration: underline; }
     .featured {
       padding: 2rem;
       max-width: 1200px;
@@ -99,7 +103,6 @@
     }
     .cart-link { font-weight: bold; }
 
-    /* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -144,7 +147,7 @@
 <body>
 
   <header>
-    <div class="logo">SneakerVerse</div>
+    <a href="index.html" class="logo">SneakerVerse</a>
     <nav>
       <a href="index.html">Home</a>
       <a href="cart.html" class="cart-link">Cart 🛒<span id="cart-count">0</span></a>
@@ -153,15 +156,17 @@
 
   <section class="featured">
     <h2>👟 Nike Collection</h2>
-    <select class="sort-select" onchange="sortNike(this.value)">
-      <option value="">Sort By</option>
+    <select class="sort-select" onchange="applySortFilter(this.value)">
+      <option value="">Sort & Filter</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
+      <option value="male">Gender: Male</option>
+      <option value="female">Gender: Female</option>
+      <option value="all">Show All</option>
     </select>
     <div class="product-grid" id="product-list"></div>
   </section>
 
-  <!-- Modal -->
   <div id="imageModal" class="modal">
     <button class="close-btn" onclick="closeModal()">✖</button>
     <button class="arrow arrow-left" onclick="prevImage()">‹</button>
@@ -172,34 +177,34 @@
   <script>
     const nikeProducts = [
       {
-        name: "Nike Air Max 90", price: 150,
-        images: ["nike1.jpg", "nike1-side.jpg", "nike1-back.jpg", "nike1-top.png", "nike1-heel.png", "nike1-zoom.png"]
+        name: "Nike Air Max 90", price: 150, gender: "male",
+        images: ["nike1.jpg", "nike1-side.jpg", "nike1-back.jpg"]
       },
       {
-        name: "Nike Air Force 1", price: 120,
-        images: ["nike2.jpg", "nike2-side.png", "nike2-back.png", "nike2-top.png", "nike2-heel.png", "nike2-zoom.png"]
+        name: "Nike Air Force 1", price: 120, gender: "female",
+        images: ["nike2.jpg", "nike2-side.jpg", "nike2-back.jpg"]
       },
       {
-        name: "Nike Dunk Low", price: 135,
-        images: ["nike3.jpg", "nike3-side.png", "nike3-back.png", "nike3-top.png", "nike3-heel.png", "nike3-zoom.png"]
+        name: "Nike Dunk Low", price: 135, gender: "male",
+        images: ["nike3.jpg", "nike3-side.jpg", "nike3-back.jpg"]
       },
       {
-        name: "Nike Air Jordan 1", price: 180,
-        images: ["nike4.jpg", "nike4-side.png", "nike4-back.png", "nike4-top.png", "nike4-heel.png", "nike4-zoom.png"]
+        name: "Nike Air Jordan 1", price: 180, gender: "female",
+        images: ["nike4.jpg", "nike4-side.jpg", "nike4-back.jpg"]
       },
       {
-        name: "Nike React Infinity", price: 145,
-        images: ["nike5.jpg", "nike5-side.jpg", "nike5-back.jpg", "nike5-top.jpg", "nike5-heel.jpg", "nike5-zoom.jpg"]
+        name: "Nike React Infinity", price: 145, gender: "male",
+        images: ["nike5.jpg", "nike5-side.jpg", "nike5-back.jpg"]
       },
       {
-        name: "Nike Blazer Mid '77", price: 110,
-        images: ["nike6.jpg", "nike6-side.png", "nike6-back.png", "nike6-top.png", "nike6-heel.png", "nike6-zoom.png"]
+        name: "Nike Blazer Mid '77", price: 110, gender: "female",
+        images: ["nike6.jpg", "nike6-side.jpg", "nike6-back.jpg"]
       }
     ];
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    let currentImages = [];
-    let currentIndex = 0;
+    let currentImages = [], currentIndex = 0;
+    let filterType = "", sortType = "";
 
     function updateCartCount() {
       document.getElementById("cart-count").textContent = cart.length;
@@ -224,6 +229,19 @@
           <button onclick="addToCart(${index})">Add to Cart</button>
         </div>
       `).join('');
+    }
+
+    function applySortFilter(value) {
+      if (value === "male" || value === "female") filterType = value;
+      else if (value === "low" || value === "high") sortType = value;
+      else if (value === "all") { filterType = ""; sortType = ""; }
+
+      let filtered = nikeProducts.filter(p => !filterType || p.gender === filterType);
+
+      if (sortType === "low") filtered.sort((a, b) => a.price - b.price);
+      else if (sortType === "high") filtered.sort((a, b) => b.price - a.price);
+
+      renderProducts(filtered);
     }
 
     function openModal(productIndex, imageIndex = 0) {
@@ -263,13 +281,6 @@
       localStorage.setItem("cart", JSON.stringify(cart));
       updateCartCount();
       alert(`${product.name} (Size ${size}) added to cart!`);
-    }
-
-    function sortNike(type) {
-      let sorted = [...nikeProducts];
-      if (type === "low") sorted.sort((a, b) => a.price - b.price);
-      else if (type === "high") sorted.sort((a, b) => b.price - a.price);
-      renderProducts(sorted);
     }
 
     window.onload = () => {
