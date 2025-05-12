@@ -19,12 +19,28 @@
       border-color: #111;
       box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      z-index: 9999;
+      display: none;
+    }
+    .toast.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
   <header class="main-header">
     <div class="logo">SneakerVerse</div>
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
       <a href="index.html">Home</a>
       <a href="nike.html">Nike</a>
       <a href="adidas.html">Adidas</a>
@@ -46,6 +62,8 @@
     <div class="product-grid" id="featured-products"></div>
   </section>
 
+  <div class="toast" id="toast">Item added to cart!</div>
+
   <!-- Quick View Modal -->
   <div id="quickViewModal" class="modal">
     <div class="modal-content quick-view">
@@ -56,11 +74,7 @@
       <p id="quick-desc"></p>
       <label>Select Size:</label>
       <select id="quick-size">
-        <option>6</option>
-        <option>7</option>
-        <option>8</option>
-        <option>9</option>
-        <option>10</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
       </select>
       <button onclick="addQuickViewToCart()">Add to Cart</button>
     </div>
@@ -88,38 +102,45 @@
       <button onclick="registerUser()">Sign Up</button>
     </div>
   </div>
+  <!-- Existing code above remains unchanged -->
+
+  <!-- Footer -->
   <footer class="site-footer">
-  <div class="footer-container">
-    <div class="footer-section about">
-      <h3>SneakerVerse</h3>
-      <p>
-        SneakerVerse is the trusted platform for buying and reselling authentic sneakers.
-        From the latest drops to timeless classics, we ensure every pair is verified, every transaction is secure, and every sneaker enthusiast is valued.
-      </p>
-    </div>
+    <div class="footer-container">
+      <div class="footer-section about">
+        <h3>SneakerVerse</h3>
+        <p>
+          SneakerVerse is the trusted platform for buying and reselling authentic sneakers.
+          From the latest drops to timeless classics, we ensure every pair is verified, every transaction is secure, and every sneaker enthusiast is valued.
+        </p>
+      </div>
 
-    <div class="footer-section links">
-      <h4>Quick Links</h4>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="nike.html">Nike</a></li>
-        <li><a href="adidas.html">Adidas</a></li>
-        <li><a href="puma.html">Puma</a></li>
-        <li><a href="cart.html">Cart</a></li>
-      </ul>
-    </div>
+      <div class="footer-section links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="nike.html">Nike</a></li>
+          <li><a href="adidas.html">Adidas</a></li>
+          <li><a href="puma.html">Puma</a></li>
+          <li><a href="cart.html">Cart</a></li>
+        </ul>
+      </div>
 
-    <div class="footer-section contact">
-      <h4>Contact Us</h4>
-      <p>Email: support@sneakerverse.com</p>
-      <p>Phone: +1 (800) 123-4567</p>
-      <p>Address: 123 Sneaker St, Toronto, ON, Canada</p>
+      <div class="footer-section contact">
+        <h4>Contact Us</h4>
+        <p>Email: support@sneakerverse.com</p>
+        <p>Phone: +1 (800) 123-4567</p>
+        <p>Address: 123 Sneaker St, Toronto, ON, Canada</p>
+      </div>
     </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; 2025 SneakerVerse. All rights reserved.</p>
-  </div>
-</footer>
+    <div class="footer-bottom">
+      <p>&copy; 2025 SneakerVerse. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
+
 
   <script src="script.js"></script>
 </body>
