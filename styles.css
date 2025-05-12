@@ -410,3 +410,49 @@ body {
 
 
 }
+/* === Mobile Navigation (Hamburger Toggle) === */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+.hamburger span {
+  height: 3px;
+  width: 25px;
+  background: white;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .main-header {
+    flex-wrap: wrap;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .navbar {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: rgba(17, 17, 17, 0.95);
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .navbar.show {
+    display: flex;
+  }
+
+  .navbar a,
+  .navbar button,
+  #searchBar {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.75rem;
+  }
+}
+
