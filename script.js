@@ -85,3 +85,7 @@ window.onload = function () {
   `).join('');
   updateCartCount();
 };
+
+function toggleNavbar() {
+  document.getElementById("navbar").classList.toggle("show");
+}
